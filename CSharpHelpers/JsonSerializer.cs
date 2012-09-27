@@ -6,7 +6,7 @@ using System.Web.Script.Serialization;
 
 namespace CSharpHelpers
 {
-    public class JsonSerializer
+    public static class JsonSerializer
     {
         /// <summary>
         /// Builds JSON string from key-value pair and deserializes to a type
@@ -14,14 +14,14 @@ namespace CSharpHelpers
         /// <typeparam name="T"></typeparam>
         /// <param name="values"></param>
         /// <returns></returns>
-        public T Deserialize<T>(Dictionary<string, string> values)
+        public static T Deserialize<T>(Dictionary<string, string> values)
         {
             var serializer = new JavaScriptSerializer();
             var jsonString = new StringBuilder("{");
 
             foreach (KeyValuePair<string,string> value in values)
             {
-                jsonString.Append(this.FormatValuePair(value));
+                jsonString.Append(FormatValuePair(value));
             }
 
             //Remove the last comma and close the json
@@ -38,7 +38,7 @@ namespace CSharpHelpers
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonString"></param>
         /// <returns></returns>
-        public T Deserialize<T>(string jsonString)
+        public static T Deserialize<T>(string jsonString)
         {
             var serializer = new JavaScriptSerializer();
             return serializer.Deserialize<T>(jsonString);
@@ -49,7 +49,7 @@ namespace CSharpHelpers
         /// </summary>
         /// <param name="valuePair"></param>
         /// <returns></returns>
-        private string FormatValuePair(KeyValuePair<string, string> valuePair )
+        private static string FormatValuePair(KeyValuePair<string, string> valuePair )
         {
             //TODO: Cleanup illegal characters
 
