@@ -12,16 +12,18 @@ namespace CSharpHelpers
 
         public static T DeserializeXml<T>(string xmlString)
         {
-            //TODO: Implement Deserialize method
-            throw new NotImplementedException();
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
+
+            using (var xmlStringReader = new StringReader(xmlString))
+                return (T)serializer.Deserialize(xmlStringReader);
         }
 
         public static string SerializeXml<T>(T obj)
         {
             //Serialize the object
-            System.Xml.Serialization.XmlSerializer xmlize = new System.Xml.Serialization.XmlSerializer(typeof(T));
-            MemoryStream memoryStream = new MemoryStream();
-            XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
+            var xmlize = new System.Xml.Serialization.XmlSerializer(typeof(T));
+            var memoryStream = new MemoryStream();
+            var xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
 
             xmlize.Serialize(xmlTextWriter, obj);
 
