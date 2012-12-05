@@ -6,6 +6,27 @@ namespace CSharpHelpers
     {
         static void Main(string[] args)
         {
+            var text = "";
+            Console.WriteLine("Initial string: " + text);
+
+            var key = SimpleAES.GenerateEncryptionKey();
+            var vector = SimpleAES.GenerateEncryptionVector();
+
+            var encrypted = SimpleAES.Encrypt(text);
+            Console.WriteLine("Encrypted string: " + encrypted);
+
+            var decrypted = SimpleAES.Decrypt(encrypted);
+            Console.WriteLine("Decrypted string: " + decrypted);
+
+        }
+
+        private static void AutoEventTimerWorked()
+        {
+            Console.WriteLine(string.Format("Event Fired! {0}, Thread: {1}", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId));
+        }
+
+        private static void AutoEventTimerTest()
+        {
             Console.WriteLine(string.Format("App Start: {0}, Thread: {1}", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId));
             var autoTimer = new AutoEventTimer(new TimeSpan(0, 0, 0, 0, 3000), AutoEventTimerWorked);
 
@@ -23,12 +44,6 @@ namespace CSharpHelpers
             Console.WriteLine(string.Format("App End: {0}, Thread: {1}", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId));
 
             Console.ReadKey();
-
-        }
-
-        private static void AutoEventTimerWorked()
-        {
-            Console.WriteLine(string.Format("Event Fired! {0}, Thread: {1}", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId));
         }
     }
 }
