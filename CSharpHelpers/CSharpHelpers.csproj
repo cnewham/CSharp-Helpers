@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="AutoEventTimer.cs" />
     <Compile Include="FlatFileHelper.cs" />
+    <Compile Include="HttpRequestClient.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
