@@ -8,20 +8,51 @@ using System.Text;
 
 namespace CSharpHelpers
 {
-    public class HttpRequestClient
+    /// <summary>
+    /// Creates a simple http GET or POST request and returns the response asynchronously. Optimized for .NET 4.0
+    /// </summary>
+    public class SimpleHttpRequestClient
     {
-        public HttpRequestClient(string url)
+        public const string Post = "POST";
+        public const string Get = "GET";
+
+        private string _method = Get;
+
+        public SimpleHttpRequestClient(string serverUrl)
         {
-            this.Address = new Uri(url);
+            this.ServerUrl = new Uri(serverUrl);
         }
 
         #region Properties
 
-        public Uri Address { get; set; }
+        /// <summary>
+        /// Server URI
+        /// </summary>
+        public Uri ServerUrl { get; set; }
+
+        /// <summary>
+        /// Request method. Default GET
+        /// </summary>
+        public string Method
+        {
+            get { return _method; }
+            set { _method = value; }
+        }
 
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// Sends a request with no body
+        /// </summary>
+        /// <param name="callback"></param>
+        public void SendRequest(Action<string> callback)
+        {
+            this.Method = Get;
+
+            this.SendRequest(string.Empty, callback);
+        }
 
         /// <summary>
         /// Sends a JSON or XML request
@@ -30,6 +61,8 @@ namespace CSharpHelpers
         /// <param name="callback"></param>
         public void SendRequest(string data, Action<string> callback)
         {
+            this.Method = Post;
+
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             this.SendRequest(bytes, response => callback(Encoding.UTF8.GetString(response)));
         }
@@ -41,14 +74,16 @@ namespace CSharpHelpers
         /// <param name="callback"></param>
         public void SendRequest(byte[] data, Action<byte[]> callback)
         {
-            var request = (HttpWebRequest)WebRequest.Create(this.Address.AbsoluteUri);
-            request.Method = "POST";
+            var request = (HttpWebRequest)WebRequest.Create(this.ServerUrl.AbsoluteUri);
+            request.Method = this.Method;
             request.ContentLength = data.Length;
-            request.ContentType = "application/x-www-form-urlencoded";
 
-            Stream stream = request.GetRequestStream();
-            stream.Write(data, 0, data.Length);
-            stream.Close();
+            if (this.Method == Post)
+            {
+                Stream stream = request.GetRequestStream();
+                stream.Write(data, 0, data.Length);
+                stream.Close();                
+            }
 
             this.SendRequest(request, response =>
                 {
@@ -59,13 +94,15 @@ namespace CSharpHelpers
                         responseStream.CopyTo(responseData);
                     }
 
+                    response.Close();
                     callback(responseData.GetBuffer());
                 });
         }
 
         /// <summary>
-        /// Send request and get response async
+        /// Send request and get response async. 
         /// </summary>
+        /// <remarks>http://stackoverflow.com/questions/202481/how-to-use-httpwebrequest-net-asynchronously</remarks>
         /// <param name="request"></param>
         /// <param name="responseAction"></param>
         private void SendRequest(HttpWebRequest request, Action<HttpWebResponse> responseAction)
