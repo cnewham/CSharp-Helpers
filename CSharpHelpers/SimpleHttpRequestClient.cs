@@ -16,7 +16,13 @@ namespace CSharpHelpers
         public const string Post = "POST";
         public const string Get = "GET";
 
+        public const string HtmlContentType = "text/html";
+        public const string XmlContentType = "text/xml";
+        public const string JsonContentType = "application/json";
+        public const string BinContentType = "application/octet-stream";
+
         private string _method = Get;
+        private string _contentType = HtmlContentType;
 
         public SimpleHttpRequestClient(string serverUrl)
         {
@@ -39,6 +45,13 @@ namespace CSharpHelpers
             set { _method = value; }
         }
 
+
+        public string ContentType
+        {
+            get { return _contentType; }
+            set { _contentType = value; }
+        }
+
         #endregion
 
         #region Public Methods
@@ -50,18 +63,21 @@ namespace CSharpHelpers
         public void SendRequest(Action<string> callback)
         {
             this.Method = Get;
+            this.ContentType = HtmlContentType;
 
-            this.SendRequest(string.Empty, callback);
+            this.SendRequest(new byte[0], response => callback(Encoding.UTF8.GetString(response)));
         }
 
         /// <summary>
-        /// Sends a JSON or XML request
+        /// Sends a JSON request
         /// </summary>
         /// <param name="data"></param>
         /// <param name="callback"></param>
-        public void SendRequest(string data, Action<string> callback)
+        /// <param name="contentType"></param>
+        public void SendRequest(string data, Action<string> callback, string contentType)
         {
             this.Method = Post;
+            this.ContentType = contentType;
 
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             this.SendRequest(bytes, response => callback(Encoding.UTF8.GetString(response)));
