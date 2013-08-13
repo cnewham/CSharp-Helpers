@@ -22,11 +22,11 @@ namespace CSharpHelpers
         public const string BinContentType = "application/octet-stream";
 
         private string _method = Get;
-        private string _contentType = HtmlContentType;
 
         public SimpleHttpRequestClient(string serverUrl)
         {
             this.ServerUrl = new Uri(serverUrl);
+            this.QueryString = new Dictionary<string, string>();
         }
 
         #region Properties
@@ -45,12 +45,10 @@ namespace CSharpHelpers
             set { _method = value; }
         }
 
-
-        public string ContentType
-        {
-            get { return _contentType; }
-            set { _contentType = value; }
-        }
+        /// <summary>
+        /// Query string key value pair
+        /// </summary>
+        public Dictionary<string,string> QueryString { get; set; } 
 
         #endregion
 
@@ -63,9 +61,7 @@ namespace CSharpHelpers
         public void SendRequest(Action<string> callback)
         {
             this.Method = Get;
-            this.ContentType = HtmlContentType;
-
-            this.SendRequest(new byte[0], response => callback(Encoding.UTF8.GetString(response)));
+            this.SendRequest(new byte[0], HtmlContentType, response => callback(Encoding.UTF8.GetString(response)));
         }
 
         /// <summary>
@@ -74,30 +70,35 @@ namespace CSharpHelpers
         /// <param name="data"></param>
         /// <param name="callback"></param>
         /// <param name="contentType"></param>
-        public void SendRequest(string data, Action<string> callback, string contentType)
+        public void SendRequest(string data, string contentType, Action<string> callback)
         {
             this.Method = Post;
-            this.ContentType = contentType;
 
-            byte[] bytes = Encoding.UTF8.GetBytes(data);
-            this.SendRequest(bytes, response => callback(Encoding.UTF8.GetString(response)));
+            byte[] content = Encoding.UTF8.GetBytes(data);
+            this.SendRequest(content, contentType, response => callback(Encoding.UTF8.GetString(response)));
         }
 
         /// <summary>
         /// Sends a byte stream request
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="content"></param>
         /// <param name="callback"></param>
-        public void SendRequest(byte[] data, Action<byte[]> callback)
+        /// <param name="contentType"></param>
+        public void SendRequest(byte[] content, string contentType, Action<byte[]> callback)
         {
-            var request = (HttpWebRequest)WebRequest.Create(this.ServerUrl.AbsoluteUri);
+            var request = (HttpWebRequest)WebRequest.Create(this.BuildRequestUrl());
+
+            if (content.Length > 0)
+                this.Method = Post;
+
             request.Method = this.Method;
-            request.ContentLength = data.Length;
+            request.ContentLength = content.Length;
+            request.ContentType = contentType;
 
             if (this.Method == Post)
             {
                 Stream stream = request.GetRequestStream();
-                stream.Write(data, 0, data.Length);
+                stream.Write(content, 0, content.Length);
                 stream.Close();                
             }
 
@@ -111,9 +112,13 @@ namespace CSharpHelpers
                     }
 
                     response.Close();
-                    callback(responseData.GetBuffer());
+                    callback(responseData.ToArray());
                 });
         }
+
+        #endregion
+
+        #region Private Methods
 
         /// <summary>
         /// Send request and get response async. 
@@ -134,6 +139,27 @@ namespace CSharpHelpers
                     var action = (Action)iar.AsyncState;
                     action.EndInvoke(iar);
                 }, wrapperAction);
+        }
+
+        /// <summary>
+        /// Builds request url with query string parameters
+        /// </summary>
+        /// <returns></returns>
+        private string BuildRequestUrl()
+        {
+            var builder = new StringBuilder(this.ServerUrl.ToString());
+
+            if (this.QueryString.Count > 0)
+            {
+                builder.Append("?");
+
+                foreach (var item in this.QueryString)
+                    builder.AppendFormat("{0}={1}&", item.Key, item.Value);
+
+                builder.Remove(builder.Length - 1, 1);
+            }
+
+            return builder.ToString();
         }
 
         #endregion
