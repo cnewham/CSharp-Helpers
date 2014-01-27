@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\CSharpHelpers.References\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Extensions" />
@@ -46,6 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoEventTimer.cs" />
+    <Compile Include="DotNetZipPackage\ZipPackage.cs" />
+    <Compile Include="DotNetZipPackage\ZipPackageItem.cs" />
+    <Compile Include="DotNetZipPackage\ZipPackageManifest.cs" />
+    <Compile Include="DotNetZipPackage\ZipPackageItemType.cs" />
     <Compile Include="FlatFileHelper.cs" />
     <Compile Include="SimpleHttpRequestClient.cs" />
     <Compile Include="JsonSerializer.cs" />

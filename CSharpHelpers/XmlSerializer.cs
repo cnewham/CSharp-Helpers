@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace CSharpHelpers
 {
-    static class XmlSerializer
+    public static class XmlSerializer
     {
 
         public static T DeserializeXml<T>(string xmlString)
@@ -44,7 +44,7 @@ namespace CSharpHelpers
              return XmlizedString;
         }
 
-        private static String UTF8ByteArrayToString(Byte[] characters)
+        public static String UTF8ByteArrayToString(Byte[] characters)
         {
 
             UTF8Encoding encoding = new UTF8Encoding();
@@ -52,7 +52,7 @@ namespace CSharpHelpers
             return (constructedString);
         }
 
-        private static Byte[] StringToUTF8ByteArray(String pXmlString)
+        public static Byte[] StringToUTF8ByteArray(String pXmlString)
         {
             UTF8Encoding encoding = new UTF8Encoding();
             Byte[] byteArray = encoding.GetBytes(pXmlString);
