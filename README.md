@@ -12,3 +12,4 @@ Group of misc. helper classes for reference:
 | SimpleHttpRequestClient      | Sync and Async request wrapper (pre async/await commands)|
 | XmlSerializer      | Alternate serializer for XML|
 | DotNetZipPackage      | Easy use of zip packages using DotNetZip within an application|
+| TcpClientForwarder      | Forwards a local TcpClient to a remote Tcp Socket (optionally using SslStream)|
